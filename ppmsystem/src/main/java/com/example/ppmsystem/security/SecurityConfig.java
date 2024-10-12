@@ -20,6 +20,7 @@ import org.springframework.security.config.annotation.web.configurers.HeadersCon
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static com.example.ppmsystem.security.SecurityConstants.H2_URL;
 import static com.example.ppmsystem.security.SecurityConstants.SIGN_UP_URLS;
@@ -41,6 +42,9 @@ public class SecurityConfig {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {return  new JwtAuthenticationFilter();}
 
 //    @Override
 //    protected void configure(HttpSecurity http) throws Exception {
@@ -91,6 +95,7 @@ public class SecurityConfig {
                                 H2_URL
                         ).permitAll().anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults());
+        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
