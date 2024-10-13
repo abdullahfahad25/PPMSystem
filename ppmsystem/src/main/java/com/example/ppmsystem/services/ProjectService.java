@@ -2,11 +2,16 @@ package com.example.ppmsystem.services;
 
 import com.example.ppmsystem.domain.Backlog;
 import com.example.ppmsystem.domain.Project;
+import com.example.ppmsystem.domain.User;
 import com.example.ppmsystem.exceptions.ProjectIdException;
 import com.example.ppmsystem.repositories.BacklogRepository;
 import com.example.ppmsystem.repositories.ProjectRepository;
+import com.example.ppmsystem.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.security.Principal;
 
 @Service
 public class ProjectService {
@@ -17,8 +22,15 @@ public class ProjectService {
     @Autowired
     private BacklogRepository backlogRepository;
 
-    public Project saveOrUpdateProject(Project project) {
+    @Autowired
+    private UserRepository userRepository;
+
+    public Project saveOrUpdateProject(Project project, String username) {
         try {
+            User user = userRepository.findByUsername(username);
+            project.setUser(user);
+            project.setProjectLeader(user.getUsername());
+
             project.setProjectIdentifier(project.getProjectIdentifier().toUpperCase());
 
             if (project.getId() == null) {
